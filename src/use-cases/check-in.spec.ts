@@ -5,6 +5,7 @@ import { InMemoryCheckInsRepository } from '@/repositories/in-memory/in-memory-c
 import { CheckInTwiceSameDay } from './errors/check-in-twice-same-day'
 import { GymsRepository } from '@/repositories/gyms-repository'
 import { InMemoryGymsRepository } from '@/repositories/in-memory/In-memory-gyms-repository'
+import { DistanceMoreThanHundredKilometers } from './errors/distance-more-than-hundred-kilometers'
 
 let checkInsRepository: CheckInsRepository
 let gymsRepository: GymsRepository
@@ -15,6 +16,15 @@ describe('Check In Use Case', () => {
     checkInsRepository = new InMemoryCheckInsRepository()
     gymsRepository = new InMemoryGymsRepository()
     sut = new CheckInUseCase(checkInsRepository, gymsRepository)
+
+    gymsRepository.create({
+      id: 'gym-01',
+      title: 'JavaScript gym',
+      description: '',
+      phone: '',
+      latitude: -22.782011,
+      longitude: -47.2826153,
+    })
 
     vi.useFakeTimers()
   })
@@ -75,5 +85,25 @@ describe('Check In Use Case', () => {
     })
 
     expect(checkIn.id).toEqual(expect.any(String))
+  })
+
+  it('should not be able to check in on distant gym', async () => {
+    gymsRepository.create({
+      id: 'gym-02',
+      title: 'JavaScript Gym',
+      description: '',
+      phone: '',
+      latitude: -22.782011,
+      longitude: -47.2826153,
+    })
+
+    expect(async () => {
+      await sut.execute({
+        gymId: 'gym-02',
+        userId: 'user-01',
+        userLatitude: -22.7384743,
+        userLongitude: -47.2343214,
+      })
+    }).rejects.toBeInstanceOf(DistanceMoreThanHundredKilometers)
   })
 })
