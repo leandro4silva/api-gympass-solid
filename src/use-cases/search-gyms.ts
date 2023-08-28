@@ -1,13 +1,13 @@
-import { GymsRepository } from '@/repositories/gyms-repository'
-import { Gym } from '@prisma/client'
+import { GymsRepository } from "@/repositories/gyms-repository";
+import { Gym } from "@prisma/client";
 
 interface SearchGymsCaseRequest {
-  query: string
-  page: number
+  query: string;
+  page: number;
 }
 
 interface SearchGymsCaseResponse {
-  gyms: Gym[]
+  gyms: Gym[];
 }
 
 export class SearchGymsUseCase {
@@ -17,10 +17,10 @@ export class SearchGymsUseCase {
     query,
     page,
   }: SearchGymsCaseRequest): Promise<SearchGymsCaseResponse> {
-    const gyms = await this.gymsRepository.searchMany(query, page)
+    const gyms = await this.gymsRepository.searchMany(query, page);
 
     return {
       gyms,
-    }
+    };
   }
 }
